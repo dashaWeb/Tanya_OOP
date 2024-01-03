@@ -16,7 +16,15 @@ void Vector::copy(int* dest, const int* source)
 }
 void Vector::resize(const int& size, const int& value)
 {
-
+	if (size > this->capacity)
+	{
+		this->capacity = size;
+		reserve_buffer(this->capacity);
+	}
+	for (this->size; this->size < size; this->size++)
+	{
+		this->buffer[this->size] = value;
+	}
 }
 inline void Vector::reserve_buffer(const int& capacity)
 {
@@ -146,5 +154,123 @@ void Vector::reserve(const int& capacity)
 		cout << "The value of the new reserve must be greater than the current one" << endl;
 		return;
 	}
-	reserve_buffer(capacity);
+	this->capacity = capacity;
+	reserve_buffer(this->capacity);
+}
+
+Vector Vector::operator*(const int& number)
+{
+	auto tmp(*this);
+	for (size_t i = 0; i < this->size; i++)
+	{
+		tmp.buffer[i] *= number;
+	}
+	return tmp;
+}
+
+Vector Vector::operator+(const Vector& other)
+{
+	auto tmp = *this;
+	for (size_t i = 0; i < other.size; i++)
+	{
+		tmp.pushBack(other.getValue(i));
+	}
+	return tmp;
+}
+
+void Vector::operator=(const Vector& other)
+{
+	if (this->capacity < other.size)
+	{
+		this->capacity = other.capacity;
+		this->reserve_buffer(this->capacity);
+	}
+	this->size = other.size;
+	copy(this->buffer, other.buffer);
+}
+
+Vector& Vector::operator++()
+{
+	for (size_t i = 0; i < this->size; i++)
+	{
+		++this->buffer[i];
+	}
+	return *this;
+}
+
+Vector& Vector::operator++(int)
+{
+	auto tmp(*this);
+	++* this;
+	return tmp;
+}
+
+bool Vector::operator==(const Vector& other) const
+{
+	if (this->size != other.size) {
+		return false;
+	}
+	for (size_t i = 0; i < this->size; i++)
+	{
+		if (this->buffer[i] != other.buffer[i])
+			return false;
+	}
+	return true;
+}
+
+bool Vector::operator!=(const Vector& other) const
+{
+	return !(*this == other);
+}
+
+int Vector::operator[](const size_t& index) const
+{
+	static int ErrorValue = 0;
+	if (this->outRange(index))
+	{
+		cout << "Error! The index goes beyond the vector" << endl;
+		return ErrorValue;
+	}
+	return this->buffer[index];
+}
+
+int& Vector::operator[](const size_t& index)
+{
+	static int ErrorValue = 0;
+	if (this->outRange(index))
+	{
+		cout << "Error! The index goes beyond the vector" << endl;
+		return ErrorValue;
+	}
+	return this->buffer[index];
+}
+
+Vector& Vector::operator!()
+{
+	auto tmp(*this);
+	for (size_t i = 0; i < tmp.size / 2; i++)
+	{
+		swap(tmp.buffer[i], tmp.buffer[tmp.size - i - 1]);
+	}
+	return tmp;
+}
+
+void Vector::operator+=(const Vector& other)
+{
+	*this = *this + other;
+}
+
+void Vector::operator*=(const int& number)
+{
+	*this = *this * number;
+}
+
+Vector::operator int()
+{
+	int sum = 0;
+	for (size_t i = 0; i < this->size; i++)
+	{
+		sum += this->buffer[i];
+	}
+	return sum;
 }
